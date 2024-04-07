@@ -9,6 +9,11 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.embeddings import CohereEmbeddings
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import create_retrieval_chain
+
 
 # logging.getLogger()
 
@@ -56,7 +61,7 @@ class ChatAgent:
                 f"llm_backend has to be one of: {self.accepted_llm_backends} | {e}"
             )
 
-    def question(self, input="How can langsmith help with testing?"):
+    def answer(self, input="How can langsmith help with testing?"):
         output_parser = StrOutputParser()
 
         prompt = ChatPromptTemplate.from_messages(
@@ -70,6 +75,17 @@ class ChatAgent:
         prompt = {"input": f"{input}"}
         print(chain.invoke(prompt))
 
+    def set_embedding(self):
+        if self.llm_backend == "ollama":
+            self.embeddings = OllamaEmbeddings()
+        elif self.llm_backend == "openai":
+            self.embeddings = OpenAIEmbeddings()
+        elif self.llm_backend == "cohere":
+            self.embeddings = CohereEmbeddings()
+
+    def get_embeddings(self):
+        return self.embeddings
+
     def load_homepage(
         self,
         link="https://www.hemnet.se/bostader?item_types%5B%5D=bostadsratt&expand_locations=1000&location_ids%5B%5D=17744",
@@ -82,14 +98,35 @@ class ChatAgent:
         text_splitter = RecursiveCharacterTextSplitter()
         documents = text_splitter.split_documents(docs)
         vector = FAISS.from_documents(documents, embeddings)
+        return vector
 
-    def retriaval(self):
-        pass
+    def answer_with_retriaval(self):
+
+        prompt = ChatPromptTemplate.from_template(
+            """Answer the following answer based only on the provided context:
+
+        <context>
+        {context}
+        </context>
+
+        Question: {input}"""
+        )
+
+        document_chain = create_stuff_documents_chain(self.llm, prompt)
+        vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
+        retriever = vector.as_retriever()
+        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        response = retrieval_chain.invoke(
+            {"input": "how can langsmith help with testing?"}
+        )
+        print(response["answer"])
 
 
 if __name__ == "__main__":
     logging.info("Tests performed with ollama + llama2.")
+    home_page = "https://docs.smith.langchain.com/user_guide"
     chat = ChatAgent(
         llm_backend="ollama", openai_model="gpt-3.5-turbo-0125", ollama_model="llama2"
     )
-    chat.question()
+    # chat.answer()
+    chat.answer_with_retriaval()

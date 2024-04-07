@@ -11,7 +11,7 @@ class OpenAIChain:
         self.model = model
         self.llm = ChatOpenAI(openai_api_key=self.api_key, model=self.model)
 
-    def question(self, input="How can langsmith help with testing?"):
+    def answer(self, input="How can langsmith help with testing?"):
         print(f"Your input is: {input}")
         output_parser = StrOutputParser()
 
@@ -28,4 +28,4 @@ class OpenAIChain:
 
 if __name__ == "__main__":
     chat = OpenAIChain()
-    chat.question()
+    chat.answer()

@@ -9,7 +9,7 @@ class LLMChain:
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.llm = Ollama(model="llama2")
 
-    def question(self, input="How can langsmith help with testing?"):
+    def answer(self, input="How can langsmith help with testing?"):
         output_parser = StrOutputParser()
 
         prompt = ChatPromptTemplate.from_messages(
@@ -26,4 +26,4 @@ class LLMChain:
 
 if __name__ == "__main__":
     chat = LLMChain()
-    chat.question()
+    chat.answer()
