@@ -5,7 +5,8 @@ from langchain_core.output_parsers import StrOutputParser
 
 
 class OpenAIChain:
-    def __init__(self, model=):
+
+    def __init__(self, model="gpt-3.5-turbo"):
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.model = model
         self.llm = ChatOpenAI(openai_api_key=self.api_key, model=self.model)
@@ -21,6 +22,7 @@ class OpenAIChain:
             ]
         )
         chain = prompt | self.llm | output_parser
+        prompt = {"input": f"{input}"}
         print(chain.invoke(prompt))
 
 

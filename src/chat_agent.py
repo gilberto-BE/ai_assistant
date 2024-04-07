@@ -4,18 +4,28 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 import logging
+
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+# logging.getLogger()
 
-class ChatTemplate:
+logging.basicConfig(
+    filename="app.log",  # File where logs will be written
+    filemode="a",  # Append mode, so logs are added to the file; use 'w' for overwrite mode
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Format for the log messages
+    level=logging.DEBUG,  # Logging level, e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL
+)
+
+
+class ChatAgent:
 
     def __init__(
         self,
         llm_backend="ollama",
-        openai_model="gpt-3.5-turbo-0125",
+        openai_model="gpt-3.5-turbo",
         ollama_model="llama2",
     ):
         self.accepted_llm_backends = [""]
@@ -23,11 +33,14 @@ class ChatTemplate:
         self.llm_backend = llm_backend
         self.openai_model = openai_model
         self.ollama_model = ollama_model
+        self.init_llm()
+        logging.info(f"Using backend: {self.llm_backend}")
 
     def init_llm(self):
         try:
             if self.llm_backend == "ollama":
                 self.llm = Ollama(model=self.ollama_model)
+                logging.info(f"Model name: {self.ollama_model}")
 
             elif self.llm_backend == "openai":
                 self.llm = ChatOpenAI(
@@ -52,7 +65,9 @@ class ChatTemplate:
                 ("user", "{input}"),
             ]
         )
+        # prompt.format(input=input)
         chain = prompt | self.llm | output_parser
+        prompt = {"input": f"{input}"}
         print(chain.invoke(prompt))
 
     def load_homepage(
@@ -73,5 +88,8 @@ class ChatTemplate:
 
 
 if __name__ == "__main__":
-    chat = ChatPromptTemplate(llm_backend="ollama", ollama_model="llama2")
+    logging.info("Tests performed with ollama + llama2.")
+    chat = ChatAgent(
+        llm_backend="ollama", openai_model="gpt-3.5-turbo-0125", ollama_model="llama2"
+    )
     chat.question()

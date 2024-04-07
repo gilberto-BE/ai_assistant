@@ -1,0 +1,20 @@
+2024-04-07 12:26:24,992 - INFO - Tests performed with ollama + llama2.
+2024-04-07 12:26:24,995 - INFO - Model name: llama2
+2024-04-07 12:26:24,995 - INFO - Using backend: ollama
+2024-04-07 12:26:25,001 - DEBUG - Starting new HTTPS connection (1): api.smith.langchain.com:443
+2024-04-07 12:26:25,017 - DEBUG - Starting new HTTP connection (1): localhost:11434
+2024-04-07 12:26:25,385 - DEBUG - https://api.smith.langchain.com:443 "GET /info HTTP/1.1" 200 209
+2024-04-07 12:26:25,639 - DEBUG - https://api.smith.langchain.com:443 "POST /runs/batch HTTP/1.1" 202 33
+2024-04-07 12:26:27,054 - DEBUG - http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None
+2024-04-07 12:26:40,937 - DEBUG - https://api.smith.langchain.com:443 "POST /runs/batch HTTP/1.1" 202 33
+2024-04-07 12:26:40,942 - DEBUG - Closing Client.session
+2024-04-07 12:28:41,259 - INFO - Tests performed with ollama + llama2.
+2024-04-07 12:28:41,262 - INFO - Model name: llama2
+2024-04-07 12:28:41,262 - INFO - Using backend: ollama
+2024-04-07 12:28:41,268 - DEBUG - Starting new HTTPS connection (1): api.smith.langchain.com:443
+2024-04-07 12:28:41,287 - DEBUG - Starting new HTTP connection (1): localhost:11434
+2024-04-07 12:28:41,472 - DEBUG - http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None
+2024-04-07 12:28:41,599 - DEBUG - https://api.smith.langchain.com:443 "GET /info HTTP/1.1" 200 209
+2024-04-07 12:28:41,838 - DEBUG - https://api.smith.langchain.com:443 "POST /runs/batch HTTP/1.1" 202 33
+2024-04-07 12:28:54,641 - DEBUG - https://api.smith.langchain.com:443 "POST /runs/batch HTTP/1.1" 202 33
+2024-04-07 12:28:54,645 - DEBUG - Closing Client.session
