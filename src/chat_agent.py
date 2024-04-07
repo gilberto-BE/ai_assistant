@@ -13,6 +13,9 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.embeddings import CohereEmbeddings
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
+from langchain.chains import create_history_aware_retriever
+from langchain_core.prompts import MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
 
 
 # logging.getLogger()
@@ -114,19 +117,53 @@ class ChatAgent:
 
         document_chain = create_stuff_documents_chain(self.llm, prompt)
         vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
-        retriever = vector.as_retriever()
-        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        self.retriever = vector.as_retriever()
+        retrieval_chain = create_retrieval_chain(self.retriever, document_chain)
         response = retrieval_chain.invoke(
             {"input": "how can langsmith help with testing?"}
         )
         print(response["answer"])
+
+    def chat_conversation(self):
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("user", "{input}"),
+                (
+                    "user",
+                    "Given the above conversation, generate a search query to look up to get information relevant to the conversation",
+                ),
+            ]
+        )
+        vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
+        retriever = vector.as_retriever()
+        retriever_chain = create_history_aware_retriever(
+            self.llm,
+            retriever,
+            prompt,
+        )
+        chat_history = [
+            HumanMessage(content="Can LangSmith help test my LLM applications?"),
+            AIMessage(content="Yes!"),
+        ]
+        print(
+            retriever_chain.invoke(
+                {
+                    "chat_history": chat_history,
+                    "input": "Tell me how",
+                }
+            )
+        )
 
 
 if __name__ == "__main__":
     logging.info("Tests performed with ollama + llama2.")
     home_page = "https://docs.smith.langchain.com/user_guide"
     chat = ChatAgent(
-        llm_backend="ollama", openai_model="gpt-3.5-turbo-0125", ollama_model="llama2"
+        llm_backend="ollama",
+        openai_model="gpt-3.5-turbo-0125",
+        ollama_model="llama2",
     )
     # chat.answer()
-    chat.answer_with_retriaval()
+    # chat.answer_with_retriaval()
+    chat.chat_conversation()
