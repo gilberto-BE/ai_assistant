@@ -125,50 +125,114 @@ class ChatAgent:
         print(response["answer"])
 
     def chat_conversation(self):
+
+        from langchain.chains import create_history_aware_retriever
+        from langchain_core.prompts import MessagesPlaceholder
+        from langchain_core.messages import HumanMessage, AIMessage
+
+        # First we need a prompt that we can pass into an LLM to generate this search query
+
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("user", "{input}"),
+                (
+                    "user",
+                    "Given the above conversation, generate a search query to look up to get information relevant to the conversation",
+                ),
+            ]
+        )
+        vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
+        retriever = vector.as_retriever()
+        retriever_chain = create_history_aware_retriever(self.llm, retriever, prompt)
+
+        chat_history = [
+            HumanMessage(content="Can LangSmith help test my LLM applications?"),
+            AIMessage(content="Yes!"),
+        ]
+        retriever_chain.invoke({"chat_history": chat_history, "input": "Tell me how"})
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
                     "Answer the user's questions based on the below context:\n\n{context}",
-                    MessagesPlaceholder(variable_name="chat_history"),
-                    ("user", "{input}"),
-                )
+                ),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("user", "{input}"),
             ]
         )
         document_chain = create_stuff_documents_chain(self.llm, prompt)
-        # prompt = ChatPromptTemplate.from_messages(
-        #     [
-        #         MessagesPlaceholder(variable_name="chat_history"),
-        #         ("user", "{input}"),
-        #         (
-        #             "user",
-        #             "Given the above conversation, generate a search query to look up to get information relevant to the conversation",
-        #         ),
-        #     ]
-        # )
-        vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
-        retriever = vector.as_retriever()
-        retriever_chain = create_history_aware_retriever(
-            self.llm,
-            retriever,
-            prompt,
-        )
-        retriever_chain = create_retrieval_chain(retriever_chain, document_chain)
+
+        retrieval_chain = create_retrieval_chain(retriever_chain, document_chain)
         chat_history = [
             HumanMessage(content="Can LangSmith help test my LLM applications?"),
             AIMessage(content="Yes!"),
         ]
         print(
-            retriever_chain.invoke(
+            retrieval_chain.invoke(
                 {
                     "chat_history": chat_history,
+                    "context": "Provide additional context here if necessary",
                     "input": "Tell me how",
                 }
             )
         )
 
 
-#
+#     def chat_conversation(self):
+#         prompt = ChatPromptTemplate.from_messages(
+#             [
+#                 (
+#                     "system",
+#                     "Answer the user's questions based on the below context:\n\n{context}",
+#                 ),
+#                 MessagesPlaceholder(variable_name="chat_history"),
+#                 ("user", "{input}"),
+#             ]
+#         )
+#         document_chain = create_stuff_documents_chain(self.llm, prompt)
+#         # prompt = ChatPromptTemplate.from_messages(
+#         #     [
+#         #         MessagesPlaceholder(variable_name="chat_history"),
+#         #         ("user", "{input}"),
+#         #         (
+#         #             "user",
+#         #             "Given the above conversation, generate a search query to look up to get information relevant to the conversation",
+#         #         ),
+#         #     ]
+#         # )
+#         vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
+#         retriever = vector.as_retriever()
+#         retriever_chain = create_history_aware_retriever(
+#             self.llm,
+#             retriever,
+#             prompt,
+#         )
+#         retrieval_chain = create_retrieval_chain(retriever_chain, document_chain)
+#         chat_history = [
+#             HumanMessage(content="Can LangSmith help test my LLM applications?"),
+#             AIMessage(content="Yes!"),
+#         ]
+#         print(
+#             retrieval_chain.invoke(
+#                 {
+#                     "chat_history": chat_history,
+#                     "input": "Tell me how",
+#                 },
+#             )
+#         )
+
+#         # print(
+#         #     retriever_chain.invoke(
+#         #         {
+#         #             "chat_history": chat_history,
+#         #             "input": "Tell me how",
+#         #         }
+#         #     )
+#         # )
+
+
+# #
 
 if __name__ == "__main__":
     logging.info("Tests performed with ollama + llama2.")
