@@ -127,14 +127,25 @@ class ChatAgent:
     def chat_conversation(self):
         prompt = ChatPromptTemplate.from_messages(
             [
-                MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{input}"),
                 (
-                    "user",
-                    "Given the above conversation, generate a search query to look up to get information relevant to the conversation",
-                ),
+                    "system",
+                    "Answer the user's questions based on the below context:\n\n{context}",
+                    MessagesPlaceholder(variable_name="chat_history"),
+                    ("user", "{input}"),
+                )
             ]
         )
+        document_chain = create_stuff_documents_chain(self.llm, prompt)
+        # prompt = ChatPromptTemplate.from_messages(
+        #     [
+        #         MessagesPlaceholder(variable_name="chat_history"),
+        #         ("user", "{input}"),
+        #         (
+        #             "user",
+        #             "Given the above conversation, generate a search query to look up to get information relevant to the conversation",
+        #         ),
+        #     ]
+        # )
         vector = self.load_homepage(link="https://docs.smith.langchain.com/user_guide")
         retriever = vector.as_retriever()
         retriever_chain = create_history_aware_retriever(
@@ -142,6 +153,7 @@ class ChatAgent:
             retriever,
             prompt,
         )
+        retriever_chain = create_retrieval_chain(retriever_chain, document_chain)
         chat_history = [
             HumanMessage(content="Can LangSmith help test my LLM applications?"),
             AIMessage(content="Yes!"),
@@ -155,6 +167,8 @@ class ChatAgent:
             )
         )
 
+
+#
 
 if __name__ == "__main__":
     logging.info("Tests performed with ollama + llama2.")
