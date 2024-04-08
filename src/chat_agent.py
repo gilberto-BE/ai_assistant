@@ -168,15 +168,14 @@ class ChatAgent:
             HumanMessage(content="Can LangSmith help test my LLM applications?"),
             AIMessage(content="Yes!"),
         ]
-        print(
-            retrieval_chain.invoke(
-                {
-                    "chat_history": chat_history,
-                    "context": "Provide additional context here if necessary",
-                    "input": "Tell me how",
-                }
-            )
+        response = retrieval_chain.invoke(
+            {
+                "chat_history": chat_history,
+                "context": "Provide additional context here if necessary",
+                "input": "Tell me how",
+            }
         )
+        print(response["answer"])
 
 
 #     def chat_conversation(self):
