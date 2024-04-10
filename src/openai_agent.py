@@ -11,7 +11,7 @@ from langchain.agents import AgentExecutor
 from langchain_core.messages import HumanMessage, AIMessage
 
 
-class RagAgent:
+class RAGAgent:
 
     def __init__(self, link="https://docs.smith.langchain.com/user_guide"):
         self.link = link
@@ -34,7 +34,9 @@ class RagAgent:
         retriever = vector.as_retriever()
         return retriever
 
-    def agent_search(self, user_input="how can langsmith help with testing?"):
+    def create_agent_with_search(
+        self, user_input="how can langsmith help with testing?"
+    ):
         retriever = self.get_retriever()
         retriever_tool = create_retriever_tool(
             retriever,
@@ -46,21 +48,31 @@ class RagAgent:
         tools = [retriever_tool, search]
         prompt = hub.pull("hwchase17/openai-functions-agent")
         agent = create_openai_functions_agent(self.llm, tools, prompt)
-        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
         # invoke_arg = {"input": user_input}
         # response = agent_executor.invoke(invoke_arg)
         # print(response["output"])
+
+        # chat_history = [
+        #     HumanMessage(content="Can LangSmith help test my LLM applications?"),
+        #     AIMessage(content="Yes!"),
+        # ]
+
+    def chat_with_agent(self, message="Can LangSmith help test my LLM applications?"):
+        self.create_agent_with_search()
+        self.agent_executor = self.get_agent()
         chat_history = [
-            HumanMessage(content="Can LangSmith help test my LLM applications?"),
+            HumanMessage(content=message),
             AIMessage(content="Yes!"),
         ]
         invoke_arg = {"chat_history": chat_history, "input": "Tell me how"}
-        response = agent_executor.invoke(invoke_arg)
+        response = self.agent_executor.invoke(invoke_arg)
         print(response["output"])
+
+    def get_agent(self):
+        return self.agent_executor
 
 
 if __name__ == "__main__":
-    rag_agent = RagAgent()
-    rag_agent.agent_search(
-        "how did the NYSE and stockholm stock marekets closed today? Please give the answers in percentage change."
-    )
+    rag_agent = RAGAgent()
+    rag_agent.chat_with_agent(message="what is the weather in el salvador")
