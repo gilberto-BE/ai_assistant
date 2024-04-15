@@ -16,7 +16,7 @@ from langchain.agents import AgentExecutor
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain_core.messages import BaseMessage
 from langserve import add_routes
-from openai_agent import RAGAgent
+from src.openai_agent_langchain import RAGAgent
 
 
 def define_app():
