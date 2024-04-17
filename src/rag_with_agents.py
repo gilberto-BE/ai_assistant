@@ -12,12 +12,14 @@ class RAGAgent:
         docs_path="https://raw.githubusercontent.com/microsoft/autogen/main/README.md",
     ):
         self.llm_config = {
+            "timeout": 600,
+            "cache_seed": 42,
             "config_list": [
                 {
                     "model": model_name,
                     "api_key": os.environ["OPENAI_API_KEY"],
                 }
-            ]
+            ],
         }
         # self.llm_config = llm_config
         self.docs_path = docs_path
