@@ -23,6 +23,7 @@ class RAGAgent:
         }
         # self.llm_config = llm_config
         self.docs_path = docs_path
+        self.start_assistant()
 
     def start_assistant(self):
         self.assistant = RetrieveAssistantAgent(
@@ -38,7 +39,7 @@ class RAGAgent:
             },
         )
 
-    def init_chat(self):
+    def start_chat(self):
 
         self.assistant.reset()
         self.ragproxyagent.initiate_chat(
@@ -47,8 +48,10 @@ class RAGAgent:
             problem="What is autogen?",
         )
 
+        # self.userproxyagent = autogen.UserProxyAgent(name="userproxyagent")
+        # self.userproxyagent.initiate_chat(self.assistant, message="what is autogen?")
+
 
 if __name__ == "__main__":
     agent = RAGAgent()
-    agent.start_assistant()
-    agent.init_chat()
+    agent.start_chat()
