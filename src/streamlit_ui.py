@@ -56,7 +56,7 @@ def main():
 
     model_option = st.sidebar.selectbox(
         "Choose the model",
-        ["OpenAI", "llama3", "phi3"],
+        ["OpenAI", "llama3", "gemma", "phi3"],
     )
 
     if "openai_model" not in st.session_state:
@@ -81,8 +81,10 @@ def main():
                 stream = openai_model(prompt, model=st.session_state["openai_model"])
             elif model_option == "llama3":
                 stream = ollama_model(prompt, model="llama3")
+            elif model_option == "gemma":
+                stream = ollama_model(prompt, model="gemma:latest")
             elif model_option == "phi3":
-                stream = ollama_model(prompt, model="phi3")
+                stream = openai_model(prompt, model="phi3")
 
             for chunk in stream:
                 full_response += chunk
