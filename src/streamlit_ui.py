@@ -3,6 +3,35 @@ import time
 import random
 from openai import OpenAI
 import os
+import ollama
+import openai
+
+
+def ollama_model(prompt, model="llama3"):
+    stream_response = ollama.chat(
+        model=model,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        stream=True,
+    )
+    for chunk in stream_response:
+        yield chunk["message"]["content"]
+
+
+def openai_model(prompt, model="gpt-4o"):
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        stream=True,
+    )
+    for chunk in response:
+        if chunk.choices[0].delta.content is not None:
+            yield chunk.choices[0].delta.content
 
 
 # Streamed response emulator
@@ -21,9 +50,14 @@ def response_generator():
 
 
 def main():
-    st.title("El Chato with GPT-4o")
+    st.title("El Chato/GPT-4o")
 
     client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+    model_option = st.sidebar.selectbox(
+        "Choose the model",
+        ["OpenAI", "llama3", "phi3"],
+    )
 
     if "openai_model" not in st.session_state:
         st.session_state["openai_model"] = "gpt-3.5-turbo"
@@ -41,16 +75,22 @@ def main():
             st.markdown(prompt)
 
         with st.chat_message("assistant"):
-            stream = client.chat.completions.create(
-                model=st.session_state["openai_model"],
-                messages=[
-                    {"role": m["role"], "content": m["content"]}
-                    for m in st.session_state.messages
-                ],
-                stream=True,
-            )
-            response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            message_placeholder = st.empty()
+            full_response = ""
+            if model_option == "OpenAI":
+                stream = openai_model(prompt, model=st.session_state["openai_model"])
+            elif model_option == "llama3":
+                stream = ollama_model(prompt, model="llama3")
+            elif model_option == "phi3":
+                stream = ollama_model(prompt, model="phi3")
+
+            for chunk in stream:
+                full_response += chunk
+                message_placeholder.markdown(full_response + "|")
+            message_placeholder.markdown(full_response)
+        st.session_state.messages.append(
+            {"role": "assistant", "content": full_response}
+        )
 
 
 if __name__ == "__main__":
