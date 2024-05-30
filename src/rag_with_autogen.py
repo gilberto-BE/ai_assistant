@@ -45,7 +45,7 @@ class RAGAgent:
         self.ragproxyagent.initiate_chat(
             self.assistant,
             message=self.ragproxyagent.message_generator,
-            problem="What is autogen?",
+            problem="What is the capital of kenya?",
         )
 
         # self.userproxyagent = autogen.UserProxyAgent(name="userproxyagent")
