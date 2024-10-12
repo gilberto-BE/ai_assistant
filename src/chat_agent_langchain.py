@@ -34,7 +34,7 @@ class ChatAgent:
         self,
         llm_backend="ollama",
         openai_model="gpt-3.5-turbo",
-        ollama_model="llama2",
+        ollama_model="llama3.1",
     ):
         self.accepted_llm_backends = [""]
         self.api_key = os.getenv("OPENAI_API_KEY")
