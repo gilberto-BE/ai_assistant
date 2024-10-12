@@ -1,0 +1,32 @@
+[project]
+name = "ai-assistant"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "@gilberto23", email = "gilberto@helicon.ai" }
+]
+dependencies = [
+    "langchain-community>=0.3.2",
+    "langchain-openai>=0.2.2",
+    "bs4>=0.0.2",
+    "faiss-cpu>=1.9.0",
+    "langchain>=0.3.3",
+    "fastapi>=0.115.2",
+    "langserve[all]>=0.3.0",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_assistant"]

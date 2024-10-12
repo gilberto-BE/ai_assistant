@@ -13,7 +13,7 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain import hub
 from langchain.agents import create_openai_functions_agent
 from langchain.agents import AgentExecutor
-from langchain.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from langchain_core.messages import BaseMessage
 from langserve import add_routes
 from openai_agent_langchain import RAGAgent
