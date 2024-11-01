@@ -76,5 +76,9 @@ This is the end of the message.
     """
 
     agent = CoderAgent(model_name="gpt-3.5-turbo")
-    # agent.reply(message=message)
-    agent.chat()
+    agent.reply(message=message)
+    cond = True
+    # while cond:
+    inp = input("Enter a message: ")
+    agent.chat(message=inp)
+    # inp = input("Continue? (y/n): ")

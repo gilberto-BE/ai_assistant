@@ -41,10 +41,10 @@ class ChatAgent:
         self.llm_backend = llm_backend
         self.openai_model = openai_model
         self.ollama_model = ollama_model
-        self.init_llm()
+        self.get_llm()
         logging.info(f"Using backend: {self.llm_backend}")
 
-    def init_llm(self):
+    def get_llm(self):
         try:
             if self.llm_backend == "ollama":
                 self.llm = Ollama(model=self.ollama_model)
