@@ -7,15 +7,10 @@ import ollama
 import openai
 
 
-def ollama_model(prompt, model="llama3"):
+def ollama_model(prompt, model="llama3.1"):
     stream_response = ollama.chat(
         model=model,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
+        messages=[{"role": "user", "content": prompt}],
         stream=True,
     )
     for chunk in stream_response:
@@ -56,7 +51,7 @@ def main():
 
     model_option = st.sidebar.selectbox(
         "Choose the model",
-        ["OpenAI", "llama3", "gemma", "phi3"],
+        ["OpenAI", "llama3.1", "gemma", "phi3"],
     )
 
     if "openai_model" not in st.session_state:

@@ -50,7 +50,7 @@ Reply 'TERMINATE' in the end when everything is done.
             messages=[{"role": "user", "content": message}]
         )
         print(reply)
-        print(os.listdir(self.temp_dir.name))
+        # print(os.listdir(self.temp_dir.name))
         self.temp_dir.cleanup()
 
     def chat(self, message="Write Python code to calculate the 14th Fibonacci number."):
@@ -79,6 +79,6 @@ This is the end of the message.
     agent.reply(message=message)
     cond = True
     # while cond:
-    inp = input("Enter a message: ")
+    inp = input("What can I help you with?: ")
     agent.chat(message=inp)
     # inp = input("Continue? (y/n): ")
