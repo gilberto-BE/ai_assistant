@@ -9,3 +9,6 @@ wheels/
 # venv
 .venv
 venv
+.cache/
+temp/
+*.log
