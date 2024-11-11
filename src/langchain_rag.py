@@ -10,34 +10,48 @@ from langchain.agents import create_openai_functions_agent
 from langchain.agents import AgentExecutor
 from langchain_core.messages import HumanMessage, AIMessage
 
+from dataclasses import dataclass
+
+
+@dataclass
+class RAGConfig:
+    link: str = "https://docs.smith.langchain.com/user_guide"
+
 
 class RAGAgent:
-
+    # TODO:
+    # 1. USE RAGConfig to set the link
+    # 2. Add llm as a parameter to the constructor, as of now openai is hardcoded
     def __init__(self, link="https://docs.smith.langchain.com/user_guide"):
         self.link = link
         self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
-    def load_homepage(
-        self,
-    ):
+    def get_docs(self):
         loader = WebBaseLoader(self.link)
         docs = loader.load()
-        embeddings = OpenAIEmbeddings()
+        return docs
 
+    def split_docs(self, docs):
         text_splitter = RecursiveCharacterTextSplitter()
         documents = text_splitter.split_documents(docs)
+        return documents
+
+    def get_vector(self, documents):
+        embeddings = OpenAIEmbeddings()
         vector = FAISS.from_documents(documents, embeddings)
         return vector
 
-    def get_retriever(self):
-        vector = self.load_homepage()
+    def pipeline(self):
+        docs = self.get_docs()
+        documents = self.split_docs(docs)
+        vector = self.get_vector(documents)
         retriever = vector.as_retriever()
         return retriever
 
     def create_agent_with_search(
         self, user_input="how can langsmith help with testing?"
     ):
-        retriever = self.get_retriever()
+        retriever = self.pipeline()  # self.get_retriever()
         retriever_tool = create_retriever_tool(
             retriever,
             "langsmith_search",
@@ -49,14 +63,6 @@ class RAGAgent:
         prompt = hub.pull("hwchase17/openai-functions-agent")
         agent = create_openai_functions_agent(self.llm, tools, prompt)
         self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-        # invoke_arg = {"input": user_input}
-        # response = agent_executor.invoke(invoke_arg)
-        # print(response["output"])
-
-        # chat_history = [
-        #     HumanMessage(content="Can LangSmith help test my LLM applications?"),
-        #     AIMessage(content="Yes!"),
-        # ]
 
     def chat_with_agent(self, message="Can LangSmith help test my LLM applications?"):
         self.create_agent_with_search()

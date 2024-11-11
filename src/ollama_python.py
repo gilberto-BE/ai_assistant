@@ -5,7 +5,7 @@
 #     for chunk in stream:
 #         print(chunk['message']['content'], end='',flush=True)
 
-import dataclass
+from dataclasses import dataclass
 from openai import OpenAI
 
 

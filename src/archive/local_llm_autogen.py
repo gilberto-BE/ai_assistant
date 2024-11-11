@@ -1,3 +1,6 @@
+from autogen import UserProxyAgent, ConversableAgent
+
+
 local_llm_config = {
     "config_list": [
         {
