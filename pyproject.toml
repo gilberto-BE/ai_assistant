@@ -1,5 +1,5 @@
 [project]
-name = "ai-assistant"
+name = "ai_assistant"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
@@ -64,6 +64,4 @@ select = [
 ]
 ignore = ["E501"]  # Ruff format takes care of line-too-long
 
-[tool.kedro_telemetry]
-project_id = "1181194f2ce44a5ab343753c6bbb6526"
 
